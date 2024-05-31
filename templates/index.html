@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Trabalho do FAB</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f9;
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                display: flex;
+                justify-content: flex-end;
+                align-items: flex-end;
+            }
+            #chatContainer {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: #ffffff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+                width: 300px;
+                max-width: 100%;
+                height: 400px;
+                display: flex;
+                flex-direction: column;
+            }
+            h1 {
+                font-size: 18px;
+                color: #333333;
+                margin: 10px 20px 0 20px;
+            }
+            h2 {
+                font-size: 14px;
+                color: #777777;
+                margin: 0 20px 10px 20px;
+            }
+            form {
+                display: flex;
+                justify-content: space-between;
+                margin: 10px;
+            }
+            input[type="text"] {
+                flex: 1;
+                padding: 10px;
+                border: 1px solid #cccccc;
+                border-radius: 4px;
+                margin-right: 10px;
+                font-size: 14px;
+            }
+            button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                background-color: #007bff;
+                color: #ffffff;
+                font-size: 14px;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #0056b3;
+            }
+            ul {
+                list-style-type: none;
+                padding: 0;
+                flex: 1;
+                overflow-y: auto;
+                margin: 0 10px 10px 10px;
+            }
+            li {
+                padding: 10px;
+                border-radius: 4px;
+                margin-bottom: 10px;
+                max-width: 80%;
+                word-wrap: break-word;
+            }
+            .sent {
+                background-color: #d1e7dd;
+                align-self: flex-start;
+            }
+            .received {
+                background-color: #f8d7da;
+                align-self: flex-end;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="chatContainer">
+            <h1>Ajuda</h1>
+            <h2>Seu Ticket: <span id="chat-id"></span></h2>
+            <ul id='messages'>
+            </ul>
+            <form action="" onsubmit="sendMessage(event)">
+                <input type="text" id="messageText" autocomplete="off"/>
+                <button>Enviar</button>
+            </form>
+        </div>
+        <script>
+            var client_id = Date.now();
+            document.querySelector("#chat-id").textContent = client_id;
+            var chatSocket = new WebSocket(`ws://localhost:8000/ws/${client_id}`);
+            chatSocket.onmessage = function(event) {
+                var messages = document.getElementById('messages');
+                var message = document.createElement('li');
+                message.classList.add('received');
+                var content = document.createTextNode(event.data);
+                message.appendChild(content);
+                messages.appendChild(message);
+                messages.scrollTop = messages.scrollHeight;
+            };
+            function sendMessage(event) {
+                var input = document.getElementById("messageText");
+                chatSocket.send(input.value);
+                input.value = '';
+                event.preventDefault();
+            }
+        </script>
+    </body>
+</html>
